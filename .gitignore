@@ -1,0 +1,17 @@
+# Default ignored files
+######################
+# Pycharm
+######################
+.idea/
+.DS_Store
+__pycache__/
+*.iml
+*.iws
+*.ipr
+*.ids
+*.orig
+*.pgm
+
+# Default ignored files
+/workspace.xml
+/venv
