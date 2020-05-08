@@ -8,12 +8,12 @@ import java.util.List;
 
 final class CaesarLeader extends PlayerImpl {
 
-    private final static int HISTORY_RECORDS = 100;
-    private List<Record> recordDataList;
+    private final static int HISTORY_RECORDS = 99;
+    private int currentDayNumber;
+    private static List<Record> recordDataList;
     private float coefficientA;
     private float coefficientB;
     private float leaderPublishedPrice;
-		private float totalProfit = 0;
 
     CaesarLeader() throws RemoteException, NotBoundException {
         super(PlayerType.LEADER, "Caesar Leader");
@@ -40,15 +40,21 @@ final class CaesarLeader extends PlayerImpl {
     @Override
     public void startSimulation(int p_steps) throws RemoteException {
         recordDataList = new ArrayList<>();
+        currentDayNumber = HISTORY_RECORDS;
         initialiseHistoryData();
-        calculateLinearFunction();
-        leaderPublishedPrice = calculateLeaderPrice();
     }
 
     private void initialiseHistoryData() throws RemoteException {
         for (int day = 1; day <= HISTORY_RECORDS; day++) {
             recordDataList.add(m_platformStub.query(PlayerType.LEADER, day));
         }
+    }
+
+    private void updateLeaderPrice() throws RemoteException {
+        currentDayNumber++;
+        recordDataList.add(m_platformStub.query(PlayerType.LEADER, currentDayNumber));
+        calculateLinearFunction();
+        leaderPublishedPrice = calculateLeaderPrice();
     }
 
     // This method will approximate follower's reaction to leader's price
@@ -68,54 +74,30 @@ final class CaesarLeader extends PlayerImpl {
         }
 
         coefficientA = (sumLeaderSquares*sumFollower - sumLeader*sumLeaderFollowerProduct)
-                            / (HISTORY_RECORDS*sumLeaderSquares - sumLeader*sumLeader);
-        coefficientB = (HISTORY_RECORDS*sumLeaderFollowerProduct - sumLeader*sumFollower)
-                            / (HISTORY_RECORDS*sumLeaderSquares - sumLeader*sumLeader);
+                / (currentDayNumber*sumLeaderSquares - sumLeader*sumLeader);
+        coefficientB = (currentDayNumber*sumLeaderFollowerProduct - sumLeader*sumFollower)
+                / (currentDayNumber*sumLeaderSquares - sumLeader*sumLeader);
 
     }
 
     private float calculateLeaderPrice() {
+        System.out.println(String.format("\nCoefficient A: %f\nCoefficient B: %f", coefficientA, coefficientB));
         return (float) (( -3 - 0.3*coefficientA + 0.3*coefficientB)
-                        / 2* ( 0.3*coefficientB - 1));
+                / (2* ( 0.3*coefficientB - 1)));
     }
-
-   private float demand(final float leaderPrice, final float followerPrice) {
-		 return 2 - leaderPrice + 0.3 * followerPrice;
-   }
-
-	 private float calculateProfit(final float leaderPrice, final float followerPrice) {
-		 	return (leaderPrice - 1)* demand(leaderPrice, followerPrice)
-	 }
 
     @Override
     public void endSimulation() throws RemoteException {
-
-			System.out.println("Total profit: " + calculateProfit);
-        super.endSimulation();
-        //TO DO: delete the line above and put your own finalization code here
+        System.out.println("Am invins");
     }
 
     @Override
     public void proceedNewDay(int p_date) throws RemoteException {
+        currentDayNumber++;
+        recordDataList.add(m_platformStub.query(PlayerType.LEADER, currentDayNumber));
+        calculateLinearFunction();
+        leaderPublishedPrice = calculateLeaderPrice();
         m_platformStub.publishPrice(PlayerType.LEADER, leaderPublishedPrice);
-
-				Record newRecord = m_platformStub.query(PlayerType.LEADER, p_date);
-
-				totalProfit += calculateProfit(newRecord.m_leaderPrice, newRecord.m_followerPrice);
-
-
-
-
-        /*
-         * Check for new price
-         * Record l_newRecord = m_platformStub.query(m_type, p_date);
-         *
-         * Your own math model to compute the price here
-         * ...
-         * float l_newPrice = ....
-         *
-         * Submit your new price, and end your phase
-         * m_platformStub.publishPrice(m_type, l_newPrice);
-         */
     }
+
 }
