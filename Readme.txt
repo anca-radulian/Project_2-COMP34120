@@ -1,3 +1,5 @@
+Our approach and details about the implementation and results can be found in our group's journal.
+
 Leader classes:
 
 The archive contains the following leaders to be run:
