@@ -13,7 +13,6 @@ final class CaesarLeader extends PlayerImpl {
     private static List<Record> recordDataList;
     private float coefficientA;
     private float coefficientB;
-    private float leaderPublishedPrice;
 
     CaesarLeader() throws RemoteException, NotBoundException {
         super(PlayerType.LEADER, "Caesar Leader");
@@ -50,23 +49,18 @@ final class CaesarLeader extends PlayerImpl {
         }
     }
 
-    private void updateLeaderPrice() throws RemoteException {
-        currentDayNumber++;
-        recordDataList.add(m_platformStub.query(PlayerType.LEADER, currentDayNumber));
-        calculateLinearFunction();
-        leaderPublishedPrice = calculateLeaderPrice();
-    }
-
     // This method will approximate follower's reaction to leader's price
     private void calculateLinearFunction() {
         float sumLeaderSquares = 0;
         float sumLeader = 0;
         float sumFollower = 0;
         float sumLeaderFollowerProduct = 0;
+        float leaderPrice;
+        float followerPrice;
 
         for (Record record : recordDataList) {
-            float leaderPrice = record.m_leaderPrice;
-            float followerPrice = record.m_followerPrice;
+            leaderPrice = record.m_leaderPrice;
+            followerPrice = record.m_followerPrice;
             sumLeaderSquares += leaderPrice*leaderPrice;
             sumLeader += leaderPrice;
             sumFollower += followerPrice;
@@ -88,7 +82,7 @@ final class CaesarLeader extends PlayerImpl {
 
     @Override
     public void endSimulation() throws RemoteException {
-        System.out.println("Am invins");
+        System.out.println("Finished Simulation.");
     }
 
     @Override
@@ -96,7 +90,7 @@ final class CaesarLeader extends PlayerImpl {
         currentDayNumber++;
         recordDataList.add(m_platformStub.query(PlayerType.LEADER, currentDayNumber));
         calculateLinearFunction();
-        leaderPublishedPrice = calculateLeaderPrice();
+        float leaderPublishedPrice = calculateLeaderPrice();
         m_platformStub.publishPrice(PlayerType.LEADER, leaderPublishedPrice);
     }
 
