@@ -10,7 +10,7 @@ import java.util.List;
 final class PolynomialLeader extends PlayerImpl {
 
     private final static int HISTORY_RECORDS = 99;
-    private final static int WINDOW_SIZE = 100;
+    private final static int WINDOW_SIZE = 20;
     private int currentDayNumber;
     private static List<Record> recordDataList;
     private float coefficientA;
@@ -60,7 +60,7 @@ final class PolynomialLeader extends PlayerImpl {
 
         int counter = 0;
         for (int day = 0; day < recordDataList.size(); day++) {
-            if(day >= (recordDataList.size() - WINDOW_SIZE)){
+            if (day >= (recordDataList.size() - WINDOW_SIZE)) {
                 Record record = recordDataList.get(day);
                 leaderPrice = record.m_leaderPrice;
                 predictor[counter] = leaderPrice;
@@ -80,12 +80,19 @@ final class PolynomialLeader extends PlayerImpl {
         if (coefficientC == 0) {
             return (3 * (coefficientA - coefficientB + 10)) / (20 - 6 * coefficientB);
         } else {
-            double square_root = Math.sqrt(-3 * (9 * coefficientA + 70) * coefficientC + 9 * coefficientB * coefficientB + coefficientB * (9 * coefficientC - 60) + 9 * coefficientC * coefficientC + 100);
-            System.out.println("Radical: " + square_root);
+            double intermediate = -3 * (9 * coefficientA + 70) * coefficientC + 9 * coefficientB * coefficientB + coefficientB * (9 * coefficientC - 60) + 9 * coefficientC * coefficientC + 100;
+            double square_root;
+            if (intermediate < 0) {
+                square_root = Math.sqrt(-1 * intermediate);
+                square_root *= -1;
+            } else
+                square_root = Math.sqrt(intermediate);
+
+            System.out.println("Square Root: " + square_root);
             double numerator = (square_root + 3 * coefficientB - 3 * coefficientC - 10);
-            System.out.println("Numarator: " + numerator);
+            System.out.println("Numerator: " + numerator);
             double denominator = 9 * coefficientC;
-            System.out.println("Numitor: " + denominator);
+            System.out.println("Denominator: " + denominator);
 
             double price = (-1 * numerator / denominator);
             System.out.println("Current price: " + price);
