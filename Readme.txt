@@ -2,8 +2,8 @@ Leader classes:
 
 The archive contains the following leaders to be run:
 CaesarLeader.class which is implemented using a linear regression
-ForgettingFactor.class which is an extension of CaesarLeader containing the modified window approach (ForgetFactor_Results.zip contains the results for this implementation).
-PolynomialLeader.class which is implemented using polynomial regression and a moving window approach (polynomial.zip contains the results for this implementation). Inside the PolynomialLeader we used Java Matrix Package (JAMA) and PolynomialRegression class to obtain the regression coefficients.
+ForgettingFactor.class which is an extension of CaesarLeader containing the modified window approach (ForgetFactor_Results folder contains the results for this implementation).
+PolynomialLeader.class which is implemented using polynomial regression and a moving window approach (Polynomial_Results folder contains the results for this implementation). Inside the PolynomialLeader we used Java Matrix Package (JAMA) and PolynomialRegression class to obtain the regression coefficients.
 
 In terms of total Pay-off, with MK1 and MK2, CaesarLeader implementation obtains the best results out of the three implementations:
 With MK1 as follower, it obtains 17.5571842
