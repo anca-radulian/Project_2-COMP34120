@@ -10,6 +10,7 @@ import java.util.List;
 final class PolynomialLeader extends PlayerImpl {
 
     private final static int HISTORY_RECORDS = 99;
+    private final static int WINDOW_SIZE = 100;
     private int currentDayNumber;
     private static List<Record> recordDataList;
     private float coefficientA;
@@ -51,26 +52,21 @@ final class PolynomialLeader extends PlayerImpl {
     }
 
     // This method will approximate follower's reaction to leader's price
-    private void calculateLinearFunction() {
-        float sumLeaderSquares = 0;
-        float sumLeader = 0;
-        float sumFollower = 0;
-        float sumLeaderFollowerProduct = 0;
+    private void calculatePolynomialFunction() {
         float leaderPrice;
         float followerPrice;
-        double[] predictor = new double[recordDataList.size()];
-        double[] response = new double[recordDataList.size()];
+        double[] predictor = new double[WINDOW_SIZE];
+        double[] response = new double[WINDOW_SIZE];
 
         int counter = 0;
-        for (Record record : recordDataList) {
-            leaderPrice = record.m_leaderPrice;
-            predictor[counter] = leaderPrice;
-            followerPrice = record.m_followerPrice;
-            response[counter++] = followerPrice;
-            sumLeaderSquares += leaderPrice * leaderPrice;
-            sumLeader += leaderPrice;
-            sumFollower += followerPrice;
-            sumLeaderFollowerProduct += leaderPrice * followerPrice;
+        for (int day = 0; day < recordDataList.size(); day++) {
+            if(day >= (recordDataList.size() - WINDOW_SIZE)){
+                Record record = recordDataList.get(day);
+                leaderPrice = record.m_leaderPrice;
+                predictor[counter] = leaderPrice;
+                followerPrice = record.m_followerPrice;
+                response[counter++] = followerPrice;
+            }
         }
 
         PolynomialRegression regression = new PolynomialRegression(predictor, response, 2);
@@ -100,14 +96,14 @@ final class PolynomialLeader extends PlayerImpl {
 
     @Override
     public void endSimulation() throws RemoteException {
-        System.out.println("Am invins");
+        System.out.println("Finished Simulation.");
     }
 
     @Override
     public void proceedNewDay(int p_date) throws RemoteException {
         currentDayNumber++;
         recordDataList.add(m_platformStub.query(PlayerType.LEADER, currentDayNumber));
-        calculateLinearFunction();
+        calculatePolynomialFunction();
         float leaderPublishedPrice = calculateLeaderPrice();
         m_platformStub.publishPrice(PlayerType.LEADER, leaderPublishedPrice);
     }
