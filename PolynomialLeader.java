@@ -10,7 +10,7 @@ import java.util.List;
 final class PolynomialLeader extends PlayerImpl {
 
     private final static int HISTORY_RECORDS = 99;
-    private final static int WINDOW_SIZE = 20;
+    private final static int WINDOW_SIZE = 100;
     private int currentDayNumber;
     private static List<Record> recordDataList;
     private float coefficientA;
