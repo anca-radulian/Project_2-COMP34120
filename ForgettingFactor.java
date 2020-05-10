@@ -94,7 +94,7 @@ final class ForgettingFactor extends PlayerImpl{
 
     @Override
     public void endSimulation() throws RemoteException {
-        System.out.println("Mihaela, dragostea mea, Am invins");
+        System.out.println("Finished simulation.");
     }
 
     @Override
